@@ -1,0 +1,28 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "a04e18edaa555565028be506642be3ea"
+name = "Budget Finder"
+application_url = "https://tea-cards-matches-behalf.trycloudflare.com"
+embedded = true
+
+[webhooks]
+api_version = "2026-10"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products,write_products,write_app_proxy"
+
+[auth]
+redirect_urls = [
+  "https://tea-cards-matches-behalf.trycloudflare.com/auth/callback",
+  "https://tea-cards-matches-behalf.trycloudflare.com/auth/shopify/callback",
+  "https://tea-cards-matches-behalf.trycloudflare.com/api/auth/callback"
+]
+
+[app_proxy]
+url = "/apps/budget-finder"
+prefix = "apps"
+subpath = "budget-finder"
+
+[build]
+automatically_update_urls_on_dev = true
