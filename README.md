@@ -76,60 +76,46 @@ shopify app dev
 
 `read_products,write_products,write_app_proxy` (cart uses the storefront Cart Ajax API).
 
-## Production hosting (Render)
+## Production hosting (Railway)
 
-The app needs a **always-on HTTPS URL** so the storefront app proxy works without `shopify app dev`.
+The app needs an always-on HTTPS URL so the storefront app proxy works without `shopify app dev`.
 
-### 1. Database (Postgres)
+### 1. GitHub
 
-Production hosting cannot use SQLite. Use **either**:
+Repo: `https://github.com/jankaloygalarza-alt/budget-finder` (latest `main` includes `railway.toml`).
 
-**A. Neon (no Docker — recommended on Windows)**  
-1. Create a free DB at [neon.tech](https://neon.tech)  
-2. Put the connection string in `.env`:
+### 2. Create Railway project
 
-```env
-DATABASE_URL=postgresql://...@...neon.tech/neondb?sslmode=require
-```
+1. Go to [railway.app](https://railway.app) → **New Project**
+2. **Deploy from GitHub repo** → select `budget-finder`
+3. Railway uses `railway.toml` + `Dockerfile`
 
-3. Run:
+### 3. Add Postgres
 
-```bash
-npx prisma migrate deploy
-```
+1. Same project → **New** → **Database** → **PostgreSQL**
+2. Web service → **Variables** → add reference:
+   - `DATABASE_URL` = Postgres `DATABASE_URL`
 
-**B. Docker Compose** (if Docker Desktop is installed)
-
-```bash
-docker compose up -d
-# DATABASE_URL=postgresql://budget:budget@localhost:5432/budget_finder
-npx prisma migrate deploy
-```
-### 2. Push code to GitHub
-
-Create a GitHub repo for this project and push `main` (do not commit `.env`).
-
-### 3. Deploy on Render
-
-1. Go to [render.com](https://render.com) → **New** → **Blueprint**
-2. Connect the GitHub repo (this project includes `render.yaml`)
-3. Create the services (web + Postgres)
-4. Set these **secret** env vars on the web service:
+### 4. Set secrets (web service Variables)
 
 | Key | Value |
 |-----|--------|
 | `SHOPIFY_API_KEY` | from `shopify app env show` |
 | `SHOPIFY_API_SECRET` | from `shopify app env show` |
-| `SHOPIFY_APP_URL` | your Render URL, e.g. `https://budget-finder.onrender.com` |
+| `SCOPES` | `read_products,write_products,write_app_proxy` |
+| `SHOPIFY_APP_URL` | your Railway HTTPS domain |
 | `OPENAI_API_KEY` | optional |
+| `OPENAI_MODEL` | `gpt-4o-mini` (optional) |
 
-`DATABASE_URL` is wired automatically from the Render Postgres instance.
+### 5. Public URL
 
-5. After the first deploy succeeds, open `/health` — it should return `ok`.
+1. Web service → **Settings** → **Networking** → **Generate Domain**
+2. Put that URL in `SHOPIFY_APP_URL` and redeploy if needed
+3. Open `/health` — should return `ok`
 
-### 4. Point Shopify at Render
+### 6. Point Shopify at Railway
 
-Update `shopify.app.toml` `application_url` + `redirect_urls` to your Render URL, then:
+Update `shopify.app.toml` `application_url` + `redirect_urls`, then:
 
 ```bash
 shopify app deploy --allow-updates
@@ -137,8 +123,6 @@ shopify app deploy --allow-updates
 
 Re-open the app once in Admin on each shop so sessions are created in Postgres.
 
-### Notes
+### Local note
 
-- Keep `shopify app dev` only for local coding; production storefront traffic should hit Render.
-- Free Render web services may sleep — for a live storefront, use a paid/always-on plan.
-- If the Render service name differs, change `SHOPIFY_APP_URL` and `shopify.app.toml` to match.
+Production uses **Postgres** (`DATABASE_URL`). Local `shopify app dev` also needs a Postgres URL (Neon, or Railway’s public DB URL).
