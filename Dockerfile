@@ -17,7 +17,6 @@ RUN npm prune --omit=dev
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-ENV PORT=3000
 EXPOSE 3000
 
 COPY --from=build /app/package.json ./package.json
@@ -27,4 +26,5 @@ COPY --from=build /app/build ./build
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/public ./public
 
+# Railway sets PORT at runtime
 CMD ["npm", "run", "docker-start"]
