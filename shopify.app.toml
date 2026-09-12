@@ -2,7 +2,7 @@
 
 client_id = "a04e18edaa555565028be506642be3ea"
 name = "Budget Finder"
-application_url = "https://tea-cards-matches-behalf.trycloudflare.com"
+application_url = "https://budget-finder-production.up.railway.app"
 embedded = true
 
 [webhooks]
@@ -14,9 +14,7 @@ scopes = "read_products,write_products,write_app_proxy"
 
 [auth]
 redirect_urls = [
-  "https://tea-cards-matches-behalf.trycloudflare.com/auth/callback",
-  "https://tea-cards-matches-behalf.trycloudflare.com/auth/shopify/callback",
-  "https://tea-cards-matches-behalf.trycloudflare.com/api/auth/callback"
+  "https://budget-finder-production.up.railway.app/api/auth"
 ]
 
 [app_proxy]
